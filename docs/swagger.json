@@ -19,7 +19,7 @@
         "properties": {
           "error": {
             "type": "boolean",
-            "example": "true"
+            "example": true
           },
           "message": {
             "type": "string",
@@ -32,7 +32,7 @@
         "properties": {
           "error": {
             "type": "boolean",
-            "example": "true"
+            "example": true
           },
           "message": {
             "type": "string",
@@ -45,7 +45,7 @@
         "properties": {
           "error": {
             "type": "boolean",
-            "example": "true"
+            "example": true
           },
           "message": {
             "type": "string",
@@ -58,7 +58,7 @@
         "properties": {
           "error": {
             "type": "boolean",
-            "example": "true"
+            "example": true
           },
           "message": {
             "type": "string",
@@ -71,7 +71,7 @@
         "properties": {
           "error": {
             "type": "boolean",
-            "example": "true"
+            "example": true
           },
           "message": {
             "type": "string",
@@ -84,7 +84,7 @@
         "properties": {
           "error": {
             "type": "boolean",
-            "example": "true"
+            "example": true
           },
           "message": {
             "type": "string",
@@ -97,7 +97,7 @@
         "properties": {
           "error": {
             "type": "boolean",
-            "example": "true"
+            "example": true
           },
           "message": {
             "type": "string",
@@ -110,7 +110,7 @@
         "properties": {
           "error": {
             "type": "boolean",
-            "example": "true"
+            "example": true
           },
           "message": {
             "type": "string",
@@ -123,7 +123,7 @@
         "properties": {
           "error": {
             "type": "boolean",
-            "example": "true"
+            "example": true
           },
           "message": {
             "type": "string",
@@ -136,7 +136,7 @@
         "properties": {
           "error": {
             "type": "boolean",
-            "example": "true"
+            "example": true
           },
           "message": {
             "type": "string",
@@ -243,11 +243,10 @@
   "paths": {
     "/countries": {
       "get": {
-        "tags": ["Data"],
         "description": "Returns a list of all countries that are associated with one or more volcanoes, ordered alphabetically.",
         "responses": {
           "200": {
-            "description": "An array of countries. An example of the first five elements in the array is shown below.",
+            "description": "An array of countries.",
             "content": {
               "application/json": {
                 "schema": {
@@ -255,13 +254,7 @@
                   "items": {
                     "type": "string"
                   },
-                  "example": [
-                    "Algeria",
-                    "Antarctica",
-                    "Argentina",
-                    "Armenia",
-                    "Australia"
-                  ]
+                  "example": ["Algeria", "Antarctica", "Argentina", "Armenia", "Australia"]
                 }
               }
             }
@@ -271,17 +264,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "type": "boolean",
-                      "example": "true"
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Invalid query parameters. Query parameters are not permitted."
-                    }
-                  }
+                  "$ref": "#/components/schemas/InvalidParametersVolcanoes"
                 }
               }
             }
@@ -291,14 +274,13 @@
     },
     "/volcanoes": {
       "get": {
-        "tags": ["Data"],
-        "description": "Returns a list of volcanoes that are associated with the queried country. The country query parameter is required. The list can optionally be filtered by using the populatedWithin query parameter. This will return a filtered list of volcanoes that have at least one person living within the provided radius.",
+        "description": "Fetches volcanoes based on country and optionally filtered by population within certain distances.",
         "parameters": [
           {
             "name": "country",
             "in": "query",
-            "description": "Name of country",
             "required": true,
+            "description": "The country to filter volcanoes.",
             "schema": {
               "type": "string"
             }
@@ -306,8 +288,7 @@
           {
             "name": "populatedWithin",
             "in": "query",
-            "description": "Distance within X km of a volcano",
-            "required": false,
+            "description": "Filter volcanoes based on population within a specified radius.",
             "schema": {
               "type": "string",
               "enum": ["5km", "10km", "30km", "100km"]
@@ -316,7 +297,7 @@
         ],
         "responses": {
           "200": {
-            "description": "An array of objects containing id, name, country, region and subregion properties. An example of one object in the array is shown below.",
+            "description": "An array of volcanoes.",
             "content": {
               "application/json": {
                 "schema": {
@@ -375,7 +356,6 @@
     },
     "/volcano/{id}": {
       "get": {
-        "tags": ["Data"],
         "description": "Returns an object containing data for the queried volcano. If a valid JWT token is sent in the header of the request, population data for 5km, 10km, 30km and 100km is also provided. To test this using Swagger, click the green 'Authorize' button at the top of this page to enter your JWT token. A JWT token can be obtained by logging in. The path parameter (id) is required.",
         "parameters": [
           {
@@ -427,11 +407,11 @@
                     },
                     "summit": {
                       "type": "number",
-                      "example": "641"
+                      "example": 641
                     },
                     "elevation": {
                       "type": "number",
-                      "example": "2103"
+                      "example": 2103
                     },
                     "latitude": {
                       "type": "string",
@@ -443,19 +423,19 @@
                     },
                     "population_5km": {
                       "type": "number",
-                      "example": "3597"
+                      "example": 3597
                     },
                     "population_10km": {
                       "type": "number",
-                      "example": "9594"
+                      "example": 9594
                     },
                     "population_30km": {
                       "type": "number",
-                      "example": "117805"
+                      "example": 117805
                     },
                     "population_100km": {
                       "type": "number",
-                      "example": "4071152"
+                      "example": 4071152
                     }
                   }
                 }
