@@ -105,16 +105,6 @@ router.get('/:email/profile', optionalAuthenticate, async function (req, res) {
     }
 });
 
-
-
-
-
-
-
-
-
-
-
 // PUT endpoint to update user profile
 router.put('/:email/profile', authenticate, async function (req, res) {
     const { email } = req.params;
