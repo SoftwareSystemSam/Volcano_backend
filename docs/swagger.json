@@ -237,8 +237,109 @@
             "example": "Invalid input: dob must be a date in the past."
           }
         }
+      },
+      "Comment": {
+        "type": "object",
+        "properties": {
+          "comment": {
+            "type": "string",
+            "example": "This is a beautiful volcano!"
+          },
+          "rating": {
+            "type": "integer",
+            "format": "int32",
+            "example": 5
+          }
+        }
+      },
+      "Photo": {
+        "type": "object",
+        "properties": {
+          "photo_url": {
+            "type": "string",
+            "example": "http://example.com/photo.jpg"
+          }
+        }
+      },
+      "NoCommentsFound": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "boolean",
+            "example": true
+          },
+          "message": {
+            "type": "string",
+            "example": "No comments found for this volcano."
+          }
+        }
+      },
+      "InvalidRatingError": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "boolean",
+            "example": true
+          },
+          "message": {
+            "type": "string",
+            "example": "Invalid rating value"
+          }
+        }
+      },
+      "NoPhotosFound": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "boolean",
+            "example": true
+          },
+          "message": {
+            "type": "string",
+            "example": "No photos found for this volcano."
+          }
+        }
+      },
+      "UnauthorizedError": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "boolean",
+            "example": true
+          },
+          "message": {
+            "type": "string",
+            "example": "Unauthorized"
+          }
+        }
+      },
+      "VolcanoNotFoundError": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "boolean",
+            "example": true
+          },
+          "message": {
+            "type": "string",
+            "example": "Volcano not found"
+          }
+        }
+      },
+        "InternalServerError": {
+          "type": "object",
+          "properties": {
+            "error": {
+              "type": "boolean",
+              "example": true
+            },
+            "message": {
+              "type": "string",
+              "example": "Internal server error"
+            }
+          }
+        }
       }
-    }
   },
   "paths": {
     "/countries": {
@@ -900,6 +1001,276 @@
                       "example": "n1234567"
                     }
                   }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    
+    "/volcanoes/{id}/comments": {
+      "get": {
+        "tags": ["Volcano Comments"],
+        "summary": "Retrieve comments and average rating for a specific volcano",
+        "description": "Fetches all comments and calculates the average rating for the given volcano ID.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "The ID of the volcano"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "An array of comments and average rating",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "comments": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Comment"
+                      }
+                    },
+                    "averageRating": {
+                      "type": "number",
+                      "format": "float",
+                      "example": 4.5
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No comments found for this volcano.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NoCommentsFound"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalServerError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Volcano Comments"],
+        "summary": "Allows users to comment on and rate volcanoes",
+        "description": "Adds a user's comment and rating to a volcano.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "The ID of the volcano"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Comment"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Comment added successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Comment added successfully"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid rating value",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvalidRatingError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": " #/components/schemas/InternalServerError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/volcanoes/{id}/photos": {
+      "get": {
+        "tags": ["Volcano Photos"],
+        "summary": "Retrieve photos for a specific volcano",
+        "description": "Fetches all photos related to the given volcano ID.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "The ID of the volcano"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "An array of photo URLs",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Photo"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No photos found for this volcano.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NoPhotosFound"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalServerError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Volcano Photos"],
+        "summary": "Allows users to upload photos of volcanoes",
+        "description": "Adds a photo URL to the database under a specific volcano ID, requires user authentication.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "The ID of the volcano"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "userId": {
+                    "type": "string",
+                    "example": "123"
+                  },
+                  "url": {
+                    "type": "string",
+                    "example": "http://example.com/photo.jpg"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Photo added successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Photo added successfully"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized, no or invalid authentication details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Volcano not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VolcanoIdNotFound"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalServerError"
                 }
               }
             }

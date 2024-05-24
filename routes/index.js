@@ -1,6 +1,6 @@
 var express = require("express");
 var router = express.Router();
-const { optionalAuthenticateVolcano } = require('../middleware/authorization');
+const { optionalAuthenticateVolcano, authenticate } = require('../middleware/authorization');
 const {optionalAuthenticate} = require('../middleware/authorization')
 
 
@@ -139,8 +139,79 @@ router.get('/volcano/:id', optionalAuthenticateVolcano, async (req, res) => {
   }
 });
 
+// GET endpoint to retrieve comments and average rating for a specific volcano
+router.get('/volcanoes/:id/comments', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const comments = await req.db('comments').select('comment', 'rating').where({volcano_id: id});
+    if (comments.length === 0) {
+      return res.status(404).json({ error: true, message: "No comments found for this volcano." });
+    }
+    const averageResult = await req.db('comments').where({volcano_id: id}).avg('rating as averageRating').first();
+    res.status(200).json({ comments, averageRating: averageResult.averageRating ? parseFloat(averageResult.averageRating) : null });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: true, message: "Internal server error" });
+  }
+});
 
-/* GET /me hahah */
+// POST endpoint to allow users to comment on and rate volcanoes
+router.post('/volcanoes/:id/comments', async (req, res) => {
+  const { id } = req.params;
+  const { userId, comment, rating } = req.body;
+  try {
+    if (typeof rating !== 'number' || rating < 1 || rating > 5) {
+      return res.status(400).json({ error: 'Invalid rating value' });
+    }
+    await req.db('comments').insert({ user_id: userId, volcano_id: id, comment: comment, rating: rating });
+    res.status(200).json({ message: 'Comment added successfully' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: true, message: "Internal server error" });
+  }
+});
+
+// GET endpoint to retrieve photos for a specific volcano
+router.get('/volcanoes/:id/photos', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const photos = await req.db('volcano_photos').select('photo_url').where({volcano_id: id});
+    if (photos.length === 0) {
+      return res.status(404).json({ error: true, message: "No photos found for this volcano." });
+    }
+    res.status(200).json({ photos });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: true, message: "Internal server error" });
+  }
+});
+
+// POST endpoint to allow users to upload photos of volcanoes
+router.post('/volcanoes/:id/photos', authenticate, async (req, res) => {
+  const { id } = req.params;
+  const { userId, url } = req.body;
+  try {
+    // Check if the user is authenticated
+    if (!req.user) {
+      return res.status(401).json({ error: true, message: "Unauthorized" });
+    }
+
+    // Assume that req.user now contains user information if authenticated
+    const volcano = await req.db('data').where({ id: id }).first();
+    if (!volcano) {
+      return res.status(404).json({ error: true, message: "Volcano not found" });
+    }
+
+    // Insert photo information into the database
+    await req.db('volcano_photos').insert({ user_id: userId, volcano_id: id, photo_url: url });
+    res.status(200).json({ message: 'Photo added successfully' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: true, message: "Internal server error" });
+  }
+});
+
+/* GET /me*/
 router.get('/me', (req, res) => {
   res.status(200).json({
     name: "Samuel Smith",
